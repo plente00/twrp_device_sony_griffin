@@ -15,4 +15,5 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/omni_hotdog.mk
+    $(LOCAL_DIR)/twrp_griffin.mk \
+    $(LOCAL_DIR)/twrp_bahamut.mk

@@ -1,39 +1,52 @@
+#
+# Copyright (C) 2020 The TwrpBuilder Open-Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
-LOCAL_PATH := device/oneplus/hotdog
+# Configure base.mk
+$(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 
-# define hardware platform
-PRODUCT_PLATFORM := msmnile
+# Configure core_64_bit_only.mk
+$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 
-#TEST
+# Configure gsi_keys.mk
+$(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
+
+# Configure twrp
+$(call inherit-product, vendor/twrp/config/common.mk)
+
+# SHIPPING API
+PRODUCT_SHIPPING_API_LEVEL := 28
+
 # A/B support
-PRODUCT_PACKAGES += \
-    otapreopt_script \
-    cppreopts.sh \
-    update_engine \
-    update_verifier
+AB_OTA_UPDATER := true
+
+AB_OTA_PARTITIONS += \
+    boot \
+    dtbo \
+    system \
+    vbmeta \
+    vendor
 
 PRODUCT_PACKAGES += \
-    bootctrl.msmnile
+    bootctrl.sony_sm8150.recovery \
+    android.hardware.boot@1.1-impl-qti.recovery
 
-AB_OTA_POSTINSTALL_CONFIG += \
-    RUN_POSTINSTALL_system=true \
-    POSTINSTALL_PATH_system=system/bin/otapreopt_script \
-    FILESYSTEM_TYPE_system=ext4 \
-    POSTINSTALL_OPTIONAL_system=true
+# Soong namespaces
+PRODUCT_SOONG_NAMESPACES += \
+    $(DEVICE_PATH)
 
-# Enable update engine sideloading by including the static version of the
-# boot_control HAL and its dependencies.
-PRODUCT_STATIC_BOOT_CONTROL_HAL := \
-    bootctrl.msmnile \
-    libgptutils \
-    libz \
-    libcutils
-
-
-# Boot control HAL
-PRODUCT_PACKAGES += \
-    android.hardware.boot@1.0-impl \
-    android.hardware.boot@1.0-service \
-
-
-
+# PRODUCT_RELEASE_NAME ro.twrp.device.name
+PRODUCT_PROPERTY_OVERRIDES += ro.twrp.device.name=$(PRODUCT_RELEASE_NAME)
+TWRP_REQUIRED_MODULES += sony_firmware
